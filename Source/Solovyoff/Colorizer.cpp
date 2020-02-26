@@ -1,10 +1,23 @@
-#include "ColorizeFunctionLibrary.h"
+#include "Colorizer.h"
 #include "Kismet/GameplayStatics.h"
+#include "Engine/StaticMeshActor.h"
 
-void UColorizeFunctionLibrary::ColorizeNearest(const FVector& NearestTo, UWorld* World, TSubclassOf<AActor> ActorClass, const uint8 QtyNearest)
+AColorizer::AColorizer()
+{
+	PrimaryActorTick.bCanEverTick = false;
+}
+
+void AColorizer::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+void AColorizer::ColorizeNearest(TSubclassOf<AActor> ActorClass, const uint8 QtyNearest)
 {
     TArray<AActor*> Founds;
-    UGameplayStatics::GetAllActorsOfClass(World, ActorClass, Founds);
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), ActorClass, Founds);
+
+    const FVector NearestTo = GetActorLocation();
 
     TMap<float, AStaticMeshActor*> Map;
     for (AActor* Actor: Founds)
@@ -32,8 +45,8 @@ void UColorizeFunctionLibrary::ColorizeNearest(const FVector& NearestTo, UWorld*
         UStaticMeshComponent* StaticMeshComponent = StaticMeshActor->GetStaticMeshComponent();
         UMaterialInterface* Material = StaticMeshComponent->GetMaterial(0);
         UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(Material, NULL);
-        DynamicMaterial->SetVectorParameterValue(TEXT("Color"), FVector(255,0,0));
-        StaticMeshComponent->SetMaterial(0, DynamicMaterial);
+        DynamicMaterial->SetVectorParameterValue(TEXT("Color"), FVector(1,0,0));
+        StaticMeshComponent->SetMaterial(0, DynamicMaterial);    
 
         ++Counter;
     }
